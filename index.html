@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>WebIOPi</title>
+    <script type="text/javascript" src="/webiopi.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        console.log("javascript on");            
+        let connectedGamepadIndex;
+        let loopID;
+        loopID = requestAnimationFrame(loop);
+        connectedGamepadIndex = null;
+        cancelAnimationFrame(loopID);
+
+        window.addEventListener("gamepadconnected", function(e) {
+            connectedGamepadIndex = e.gamepad.index;
+            loopID = requestAnimationFrame(loop);
+            console.log("start");
+        });
+
+        window.addEventListener("gamepaddisconnected", function(e) {
+            connectedGamepadIndex = null;
+            cancelAnimationFrame(loopID);
+            console.log("stop");
+        });
+
+        const BUTTON_A_INDEX     = 0;
+        const BUTTON_B_INDEX     = 1;
+        const BUTTON_X_INDEX     = 2;
+        const BUTTON_Y_INDEX     = 3;
+        const BUTTON_LB_INDEX    = 4;
+        const BUTTON_RB_INDEX    = 5;
+        const BUTTON_LT_INDEX    = 6;
+        const BUTTON_RT_INDEX    = 7;
+        const BUTTON_BACK_INDEX  = 8;
+        const BUTTON_START_INDEX = 9;
+        const BUTTON_L3_INDEX    = 10;
+        const BUTTON_R3_INDEX    = 11;
+        const BUTTON_UP_INDEX    = 12;
+        const BUTTON_DOWN_INDEX  = 13;
+        const BUTTON_LEFT_INDEX  = 14;
+        const BUTTON_RIGHT_INDEX = 15;
+        const BUTTON_HOME_INDEX = 16;
+
+        function loop(timestamp) {                            
+            let gamepads = navigator.getGamepads();
+            let gp = gamepads[connectedGamepadIndex];
+
+            let aButton = gp.buttons[BUTTON_A_INDEX];
+            let bButton = gp.buttons[BUTTON_B_INDEX];
+            let xButton = gp.buttons[BUTTON_X_INDEX];
+            let yButton = gp.buttons[BUTTON_Y_INDEX];
+            let lbButton = gp.buttons[BUTTON_LB_INDEX];
+            let rbButton = gp.buttons[BUTTON_RB_INDEX];
+            let ltButton = gp.buttons[BUTTON_LT_INDEX];
+            let rtButton = gp.buttons[BUTTON_RT_INDEX];
+            let backButton = gp.buttons[BUTTON_BACK_INDEX];
+            let startButton = gp.buttons[BUTTON_START_INDEX];
+            let l3Button = gp.buttons[BUTTON_L3_INDEX];
+            let r3Button = gp.buttons[BUTTON_R3_INDEX];
+            let upButton = gp.buttons[BUTTON_UP_INDEX];
+            let downButton = gp.buttons[BUTTON_DOWN_INDEX];
+            let leftButton = gp.buttons[BUTTON_LEFT_INDEX];
+            let rightButton = gp.buttons[BUTTON_RIGHT_INDEX];
+            let homeButton = gp.buttons[BUTTON_HOME_INDEX];
+
+            if(aButton.pressed || bButton.pressed || xButton.pressed || yButton.pressed) {
+                console.log("leg button is pressed");
+                var d1 = aButton.value * 0.09 + bButton.value * 0.06 + xButton.value * 0.09 + yButton.value * 0.06;
+                var d2 = aButton.value * 0.06 + bButton.value * 0.09 + xButton.value * 0.09 + yButton.value * 0.06;
+                webiopi().callMacro("leg", d1, d2);
+            }else {
+                webiopi().callMacro("leg", 0.75, 0.75);
+            }
+
+            if(upButton.pressed || downButton.pressed) {
+                console.log("arm_x button is pressed");
+                var d3 = upButton.value * 0.09 + downButton.value * 0.06;
+                webiopi().callMacro("arm_x", d3);
+            }else {
+                webiopi().callMacro("arm_x", 0.75);
+            }
+
+            if(leftButton.pressed || rightButton.pressed) {
+                console.log("arm_y button is pressed");
+                var d4 = leftButton.value * 0.09 + rightButton.value * 0.06;
+                webiopi().callMacro("arm_y", d4);
+            }else {
+                webiopi().callMacro("arm_y", 0.75);
+            }
+
+            if(backButton.pressed || startButton.pressed) {
+                console.log("arm_z button is pressed");
+                var d5 = backButton.value * 0.09 + startButton.value * 0.06;
+                webiopi().callMacro("arm_z", d5);
+            }else {
+                webiopi().callMacro("arm_z", 0.75);
+            }
+
+            if(lbButton.pressed || rbButton.pressed) {
+                console.log("belt_trans button is pressed");
+                var d6 = lbButton.value * 0.09 + rbButton.value * 0.06;
+                webiopi().callMacro("belt_trans", d6);
+            } else {
+                webiopi().callMacro("belt_trans", 0.75);
+            }
+
+            if(ltButton.pressed || rtButton.pressed) {
+                console.log("belt_turn button is pressed");
+                var d7 = ltButton.value * 0.09 + rtButton.value * 0.06;
+                webiopi().callMacro("belt_turn", d7);
+            } else {
+                webiopi().callMacro("belt_turn", 0.75);
+            }
+            
+            requestAnimationFrame(loop);
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>
